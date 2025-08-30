@@ -1,0 +1,12 @@
+OUTPUT_FORMAT(binary)
+OUTPUT_ARCH(i386)
+SECTIONS {
+	. = 0x7C00;
+	.boot.text : AT(0x0) {
+		tmp/bootloader.o
+	}
+	. = 0x8000;
+	.kernel.text : AT(0x200) {
+		tmp/main.o
+	}
+}
