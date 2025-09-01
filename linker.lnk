@@ -1,22 +1,32 @@
 OUTPUT_FORMAT(binary)
 OUTPUT_ARCH(i386)
 SECTIONS {
-	KERNEL_SRC = (LOADADDR(.kernel.text) + 511)/512 + 1;
-	KERNEL_DST = ADDR(.kernel.text);
-	KERNEL_SIZE = (SIZEOF(.kernel.text) + 511)/512;
+	STAGE2_SRC = (LOADADDR(.stage2.text) + 511)/512 + 1;
+	STAGE2_DST = ADDR(.stage2.text);
+	STAGE2_SIZE = (.end - .start + 511)/512;
+	
 	. = 0x7C00;
-	.boot.text : AT(0x0) {
-		tmp/bootloader.o (.boot.text)
+	.stage1.text : AT(0x0) {
+		tmp/stage1.o (.stage1.text)
 	}
-	.boot.data : ALIGN(4) {
-		tmp/bootloader.o (.boot.data)
+	.stage1.data : ALIGN(2) {
+		tmp/stage1.o (.stage1.data)
 	}
-	.boot.constant : AT(0x1FE) {
-		tmp/bootloader.o (.boot.constant)
+	.stage1.signature : AT(0x1FE) {
+		tmp/stage1.o (.stage1.signature)
 	}
 
 	. = 0x8000;
-	.kernel.text : AT(0x200) {
+	.start = .;
+	.stage2.text : AT(0x200) {
+		tmp/stage2.o (.stage2.text)
+	}
+	.stage2.data : ALIGN(4) {
+		tmp/stage2.o (.stage2.data)
+	}
+
+	.kernel : {
 		tmp/main.o
 	}
+	.end = .;
 }
