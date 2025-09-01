@@ -1,10 +1,20 @@
 OUTPUT_FORMAT(binary)
 OUTPUT_ARCH(i386)
 SECTIONS {
+	KERNEL_SRC = (LOADADDR(.kernel.text) + 511)/512 + 1;
+	KERNEL_DST = ADDR(.kernel.text);
+	KERNEL_SIZE = (SIZEOF(.kernel.text) + 511)/512;
 	. = 0x7C00;
 	.boot.text : AT(0x0) {
-		tmp/bootloader.o
+		tmp/bootloader.o (.boot.text)
 	}
+	.boot.data : ALIGN(4) {
+		tmp/bootloader.o (.boot.data)
+	}
+	.boot.constant : AT(0x1FE) {
+		tmp/bootloader.o (.boot.constant)
+	}
+
 	. = 0x8000;
 	.kernel.text : AT(0x200) {
 		tmp/main.o

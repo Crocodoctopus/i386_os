@@ -1,6 +1,9 @@
 %define ENDL 0x0D, 0x0A
 
 extern _start 
+extern KERNEL_SRC ; as sector
+extern KERNEL_DST ; as ptr
+extern KERNEL_SIZE ; in sectors
 
 bits 16
 section .boot.text
@@ -10,6 +13,16 @@ start16:
     mov es, ax
     mov ss, ax
     mov sp, 7C00h
+
+    ; load the rest of the kernel into memory    
+    mov ah, 2 ; read operation
+    mov al, KERNEL_SIZE ; sectors to read
+    mov ch, 0
+    mov cl, KERNEL_SRC
+    mov dh, 0
+    ;mov dl, X ; 
+    mov bx, KERNEL_DST
+    int 0x13    
 
     ; start 32 bit protected mode
     cli
@@ -21,10 +34,12 @@ start16:
     
 bits 32
 start32:
-    mov word [0xB8000], 0x0F41
-    ;call _start
-    jmp $
+    call _start
+end:
+    hlt
+    jmp end
 
+section .boot.data   
 gdt_start:
     dd 0
     dd 0
@@ -48,7 +63,6 @@ gdt_start:
 gdt_desc:
     dw gdt_desc - gdt_start - 1
     dd gdt_start
-
-data:
-    times 510-($-$$) db 0
+        
+section .boot.constant
     dw 0xAA55
