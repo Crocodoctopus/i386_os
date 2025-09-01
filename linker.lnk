@@ -27,6 +27,7 @@ SECTIONS {
 
 	.kernel : {
 		tmp/main.o
+		tmp/interrupt.o
 	}
 	.end = .;
 }

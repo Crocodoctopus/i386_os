@@ -1,11 +1,14 @@
 global stage2_entry
 extern _start
 
+extern init_idt;
+extern idt;
+extern idt_descriptor;
+
 bits 16
 section .stage2.text
 stage2_entry:
-    ; load idt
-    lidt [idt_desc]
+    mov sp, 0x8000
     
     ; start 32 bit protected mode
     lgdt [gdt_desc]
@@ -16,19 +19,14 @@ stage2_entry:
 
 bits 32
 start32:
-    ;sti
-    mov eax, 0
-    idiv eax
-    ;mov word [0xb8000], 0x0F34
-    ;call _start
+    ; initialize and set idt
+    call init_idt
+    lidt [idt_descriptor]
+    
+    int3
+    mov word [0xb8000], 0x0F36
 end:
-    hlt
     jmp end
-
-idt_0:
-    mov word [0xb8000], 0x0F34
-    jmp $
-    iret
     
 section .stage2.data
 gdt_start:
@@ -54,14 +52,3 @@ gdt_start:
 gdt_desc:
     dw gdt_desc - gdt_start - 1
     dd gdt_start
-
-idt_start:
-    dw idt_0
-    dw 0x0008
-    db 0x00 ; reserved
-    db 0x8E; flags
-    dw 0x0000
-        
-idt_desc:
-    dw idt_desc - idt_start - 1
-    dd idt_start
