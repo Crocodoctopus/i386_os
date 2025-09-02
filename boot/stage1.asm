@@ -4,7 +4,7 @@ extern STAGE2_SIZE ; in sectors
 extern stage2_entry
 
 bits 16
-section .stage1.text
+section .stage1
 stage1_entry:
     cli
     mov ax, 0
@@ -31,8 +31,6 @@ stage1_entry:
     ; set idt table
     ;lidt [idt_desc]    
 
-section .stage1.data
-
-section .stage1.signature
+section .bootsig
     dw 0xAA55
 

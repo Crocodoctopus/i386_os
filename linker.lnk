@@ -1,33 +1,29 @@
 OUTPUT_FORMAT(binary)
 OUTPUT_ARCH(i386)
 SECTIONS {
-	STAGE2_SRC = (LOADADDR(.stage2.text) + 511)/512 + 1;
-	STAGE2_DST = ADDR(.stage2.text);
+	STAGE2_SRC = (LOADADDR(.stage2) + 511)/512 + 1;
+	STAGE2_DST = ADDR(.stage2);
 	STAGE2_SIZE = (.end - .start + 511)/512;
 	
 	. = 0x7C00;
-	.stage1.text : AT(0x0) {
-		tmp/stage1.o (.stage1.text)
+	.stage1 : AT(0x0) {
+		tmp/stage1.o (.stage1)
 	}
-	.stage1.data : ALIGN(2) {
-		tmp/stage1.o (.stage1.data)
-	}
-	.stage1.signature : AT(0x1FE) {
-		tmp/stage1.o (.stage1.signature)
+	.bootsig : AT(0x1FE) {
+		tmp/stage1.o (.bootsig)
 	}
 
 	. = 0x8000;
 	.start = .;
-	.stage2.text : AT(0x200) {
-		tmp/stage2.o (.stage2.text)
-	}
-	.stage2.data : ALIGN(4) {
-		tmp/stage2.o (.stage2.data)
+	.stage2 : AT(0x200) {
+		tmp/stage2.o (.stage2)
 	}
 
-	.kernel : {
-		tmp/main.o
-		tmp/interrupt.o
+	text : {
+		*(.text)
+	}
+	.data : ALIGN(4) {
+		*(.data)
 	}
 	.end = .;
 }
