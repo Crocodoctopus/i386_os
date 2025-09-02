@@ -25,4 +25,3 @@ gdt_start:
 gdt_descriptor:
     dw $ - gdt_start - 1
     dd gdt_start
-
