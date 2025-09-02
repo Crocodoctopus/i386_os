@@ -1,9 +1,11 @@
 global stage2_entry
-extern _start
+global isr32_stub_address_table
 
+extern _start
 extern init_idt32;
 extern idt;
 extern idt_descriptor;
+extern interrupt_handler
 
 bits 16
 section .stage2.text
@@ -22,7 +24,8 @@ start32:
     ; initialize and set idt
     call init_idt32
     lidt [idt_descriptor]
-    
+
+    ; test interrupt handler
     int3
     mov word [0xb8000], 0x0F36
 end:
@@ -31,21 +34,18 @@ end:
 
 ; create stubs for each interrupt
 %macro isr32_err_stub 1
-global isr32_%1
-isr32_%1:
+isr32_%+%1:
     push %1
     jmp isr32_common
 %endmacro
 
 %macro isr32_noerr_stub 1
-global isr32_%1
-isr32_%1:
+isr32_%+%1:
     push 0
     push %1
     jmp isr32_common
 %endmacro
 
-extern interrupt_handler
 isr32_noerr_stub 0
 isr32_noerr_stub 1
 isr32_noerr_stub 2
@@ -108,6 +108,15 @@ isr32_common:
 
     
 section .stage2.data
+; generate table to for all the isr32 stubs
+isr32_stub_address_table:
+%assign i 0
+%rep 22
+    dd isr32_%+i
+%assign i i+1
+%endrep
+
+; set up the gdt and forget about it
 gdt_start:
     dd 0
     dd 0
