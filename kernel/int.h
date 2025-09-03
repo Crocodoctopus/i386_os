@@ -6,3 +6,5 @@ typedef unsigned short u16;
 typedef signed short i16;
 typedef unsigned int u32;
 typedef signed int i32;
+typedef u32 usize;
+typedef i32 isize;

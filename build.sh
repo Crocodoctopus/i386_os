@@ -10,9 +10,10 @@ gcc -O2 -c kernel/gdt.c -o tmp/gdt.o -ffreestanding -nostdlib -nostartfiles -m32
 gcc -O2 -c kernel/main.c -o tmp/main.o -ffreestanding -nostdlib -nostartfiles -m32 -fno-pie
 gcc -O2 -c kernel/idt.c -o tmp/idt.o -ffreestanding -nostdlib -nostartfiles -m32 -fno-pie
 gcc -O2 -c kernel/interrupt_handler.c -o tmp/interrupt_handler.o -ffreestanding -nostdlib -nostartfiles -m32 -fno-pie
+gcc -O2 -c kernel/util.c -o tmp/util.o -ffreestanding -nostdlib -nostartfiles -m32 -fno-pie
 
 # Link.
-ld -T linker.lnk -o bin/kernel.bin tmp/idt.o tmp/main.o tmp/isr.o tmp/gdt.o tmp/interrupt_handler.o
+ld -T linker.lnk -o bin/kernel.bin tmp/idt.o tmp/main.o tmp/isr.o tmp/gdt.o tmp/interrupt_handler.o tmp/util.o
 
 # Delete tmp folder.
 rm tmp -r
