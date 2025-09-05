@@ -2,6 +2,7 @@
 
 #include "util.h"
 #include "pic.h"
+#include "terminal.h"
 
 struct __attribute__((packed)) InterruptState {
   //u32 edi, esi, ebp, kern_esp, ebx, edx, ecx, eax;
@@ -11,15 +12,15 @@ struct __attribute__((packed)) InterruptState {
 };
 
 char data[12] = { 0 };
-int j = 0;
 void __attribute((cdecl)) interrupt_handler(struct InterruptState *state) {
 
   // Handle IRQ from external devices.
   if (state->interrupt >= 32) {
-    format(data, 12, "IRQ %i", state->interrupt - 32);
-    for (int i = 0; i < 12; i++) {
-      *(u16*)(0xB8000 + 2 * j) = 0x0F00 | data[i];
-      j++;
+    format(data, 12, "IRQ %i ", state->interrupt - 32);
+    terminal_write(data, 12);
+
+    if (state->interrupt == 33) {
+      inb(0x64);
     }
     
     pic_send_eoi(state->interrupt - 32);

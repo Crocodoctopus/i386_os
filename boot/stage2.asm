@@ -4,12 +4,13 @@ extern gdt_descriptor;
 extern idt_descriptor;
 extern _start
 extern init_pic;
+extern terminal_clear;
 
 bits 16
 section .stage2
 stage2_entry:
     mov sp, 0x8000
-    
+
     ; start 32 bit protected mode
     lgdt [gdt_descriptor]
     mov eax, cr0
@@ -19,6 +20,9 @@ stage2_entry:
 
 bits 32
 start32:
+    ;
+    call terminal_clear
+
     ; initialize and set idt
     call init_idt32
     lidt [idt_descriptor]

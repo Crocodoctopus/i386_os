@@ -26,11 +26,6 @@ stage1_entry:
     ; jump to stage 2
     jmp stage2_entry
 
-    ; jump to "stage2"
-
-    ; set idt table
-    ;lidt [idt_desc]    
-
 section .bootsig
     dw 0xAA55
 
