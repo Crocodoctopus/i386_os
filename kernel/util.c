@@ -36,6 +36,11 @@ i32 format(char *buffer, const usize n, const char *format, ...) {
               *digits_cursor++ = num % 10 + 0x30;
               num /= 10;
             }
+
+            // Special case for arg == 0
+            if (arg == 0) {
+              *digits_cursor++ = '0';
+            }
             
             // Place - if applicable.
             if (arg < 0) {
