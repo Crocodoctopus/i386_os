@@ -1,6 +1,6 @@
 global gdt_descriptor
 
-align 32
+align 4
 section .data
 gdt_start:
     dd 0

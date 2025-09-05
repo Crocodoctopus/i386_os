@@ -3,6 +3,7 @@ extern init_idt32;
 extern gdt_descriptor;
 extern idt_descriptor;
 extern _start
+extern init_pic;
 
 bits 16
 section .stage2
@@ -22,9 +23,14 @@ start32:
     call init_idt32
     lidt [idt_descriptor]
 
-    ; test interrupt handler
-    int3
-    mov word [0xb8000], 0x0F36
+    ; initialize pic
+    call init_pic;
+
+    ; enable interrupts
+    sti
+
+    ;
+    call _start
 end:
     hlt
     jmp end

@@ -12,11 +12,12 @@ isr32_%+%1:
 
 %macro isr32_noerr_stub 1
 isr32_%+%1:
-    push 0
+    push 42
     push %1
     jmp isr32_common
 %endmacro
 
+; 32 reserved internal isr
 isr32_noerr_stub 0
 isr32_noerr_stub 1
 isr32_noerr_stub 2
@@ -49,23 +50,25 @@ isr32_noerr_stub 28
 isr32_noerr_stub 29
 isr32_err_stub   30
 isr32_noerr_stub 31
-isr32_common:
-    pusha
-    
-    push esp
-    call interrupt_handler
-    add esp, 4
 
-    popa
-    add esp, 8
-    iret
-    
-; generate table to for all the isr32 stubs
-ALIGN 32
-isr32_stub_address_table:
-%assign i 0
-%rep 22
-    dd isr32_%+i
+; remaining 224 external isr
+%assign i 32
+%rep 244
+isr32_noerr_stub i
 %assign i i+1
 %endrep
 
+isr32_common:
+    push esp
+    call interrupt_handler
+    add esp, 12
+    iret
+    
+; generate lookup table to for all isr
+ALIGN 4
+isr32_stub_address_table:
+%assign i 0
+%rep 256
+    dd isr32_%+i
+%assign i i+1
+%endrep
