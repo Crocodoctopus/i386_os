@@ -1,11 +1,16 @@
 extern void _start(void);
 
-const unsigned char msg[] = "Hello world!";
+#include "terminal.h"
+#include "util.h"
 
 void _start(void) {
-  unsigned short *ptr = (unsigned short*)0xb8000;
-  for (unsigned char i = 0; i < sizeof(msg); i++) {
-    *(ptr + i) = msg[i] | 0x0F00;
+  // Print the beginning of 0x400000
+  char buf[5];
+  for (u16 i = 0; i < TERMINAL_WIDTH * TERMINAL_HEIGHT / 5; i++) {
+    u8 byte = *(u8*)(0x400000 + i);
+
+    format(buf, 5, "%i ", byte);
+    terminal_write(buf, 5);
   }
   return;
 }
