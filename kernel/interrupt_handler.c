@@ -16,13 +16,18 @@ void __attribute((cdecl)) interrupt_handler(struct InterruptState *state) {
 
   //
   if (state->interrupt < 32) {
-    format(data, 32, "Interrupt: %i\n", state->interrupt);
+    format(data, 32, "Interrupt: %i ", state->interrupt);
     terminal_write(data, 32);
+  }
+
+  if (state->interrupt == 13) {
+    __asm__ volatile("hlt");
+    
   }
 
   // Handle IRQ from external devices.
   if (state->interrupt >= 32) {
-    format(data, 32, "IRQ %i\n", state->interrupt - 32);
+    format(data, 32, "IRQ %i ", state->interrupt - 32);
     terminal_write(data, 32);
     if (state->interrupt == 33) {
       inb(0x64);

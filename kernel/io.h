@@ -2,51 +2,51 @@
 
 #include "int.h"
 
-inline void outb(u16 port, u8 data) {
-  asm volatile ("outb %b0, %w1"
+static inline void outb(u16 port, u8 data) {
+  __asm__ volatile ("outb %b0, %w1"
     :
     : "a"(data), "Nd"(port)
     : "memory");
 }
-inline void outw(u16 port, u16 data) {
-  asm volatile ("outw %b0, %w1"
+static inline void outw(u16 port, u16 data) {
+  __asm__ volatile ("outw %w0, %w1"
     :
     : "a"(data), "Nd"(port)
     : "memory");
 }
-inline void outl(u16 port, u32 data) {
-  asm volatile ("outl %b0, %w1"
+static inline void outl(u16 port, u32 data) {
+  __asm__ volatile ("outl %d0, %w1"
     :
     : "a"(data), "Nd"(port)
     : "memory");
 }
 
-inline u8 inb(u16 port) {
+static inline u8 inb(u16 port) {
   u8 ret;
-  asm volatile ("inb %w1, %b0"
+  __asm__ volatile ("inb %w1, %b0"
     : "=a"(ret)
     : "Nd"(port)
     : "memory");
   return ret;
 }
-inline u16 inw(u16 port) {
+static inline u16 inw(u16 port) {
   u16 ret;
-  asm volatile ("inb %w1, %b0"
+  __asm__ volatile ("inw %w1, %w0"
     : "=a"(ret)
     : "Nd"(port)
     : "memory");
   return ret;
 }
-inline u32 inl(u16 port) {
+static inline u32 inl(u16 port) {
   u32 ret;
-  asm volatile ("inb %w1, %b0"
+  __asm__ volatile ("inl %w1, %d0"
     : "=a"(ret)
     : "Nd"(port)
     : "memory");
   return ret;
 }
 
-inline void io_wait(void) {
+static inline void io_wait(void) {
   outb(0x80, 0);
 }
 

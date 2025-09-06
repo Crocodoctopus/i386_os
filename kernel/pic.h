@@ -23,4 +23,7 @@
 
 #define PIC_EOI 0x20
 
+extern struct IDT32Descriptor idt_descriptor;
+
 void pic_send_eoi(u8 irq);
+void init_pic(void);

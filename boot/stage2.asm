@@ -6,6 +6,10 @@ extern _start
 extern init_pic
 extern terminal_clear
 extern load_kernel
+extern init_page_directory
+extern PAGE_DIRECTORY_PHYS
+
+%define BIT(x) (1 << x)
 
 bits 16
 section .text
@@ -22,33 +26,26 @@ start32:
     ; load the rest of the kernel
     call load_kernel
 
+    ; start basic paging
+    call init_page_directory
+    mov word [0xB8002], 0x0F00 | '*'
+
+    mov eax, cr4
+    or eax, BIT(4) ; page size extension
+    mov cr4, eax
+
+    mov eax, PAGE_DIRECTORY_PHYS
+    mov cr3, eax
+
+    mov eax, cr0
+    or eax, BIT(31) | BIT(1)
+    mov cr0, eax
+    
     ; correct the gdt
     lgdt [gdt_descriptor]
 
-    ; start basic paging so we can jump to kernel
-
     ; jump to start, never return
-
-    ;;; Everything beyond here should probably be in kernel
-
-    ; clear the terminal
-    call terminal_clear
-
-    ; initialize and set idt
-    call init_idt32
-    lidt [idt_descriptor]
-
-    ; initialize pic
-    call init_pic;
-
-    ; enable interrupts
-    sti
-
-    ;
-    call _start
-end:
-    hlt
-    jmp end
+    jmp _start
 
 tmp_gdt:
     dd 0

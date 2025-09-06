@@ -19,3 +19,5 @@ struct __attribute__((packed)) IDT32Descriptor {
   u16 size;
   u32 offset;
 };
+
+void init_idt32(void);

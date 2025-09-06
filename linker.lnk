@@ -5,9 +5,11 @@ SECTIONS {
 	STAGE2_DST = ADDR(.stage2);
 	STAGE2_SIZE = (SIZEOF(.stage2) + 511)/512;
 
-	KERNEL_SRC = LOADADDR(.kernel)/512;
-	KERNEL_DST = ADDR(.kernel);
-	KERNEL_LEN = (SIZEOF(.kernel) + 511)/512;
+	KERNEL_SRC = LOADADDR(.kernel_start)/512;
+	KERNEL_DST = 0x400000;
+	KERNEL_LEN = (.kernel_end - ADDR(.kernel_start) + 511)/512;
+
+	PAGE_DIRECTORY_PHYS = KERNEL_DST;
 	
 	.stage1 0x7C00 : AT(0x0) {
 		tmp/stage1.o (.stage1)
@@ -17,11 +19,15 @@ SECTIONS {
 	}
 
 	.stage2 0x8000 : AT(0x200) {
-		tmp/stage2.o (.text)
-		tmp/ata.o (.text)
+		tmp/stage2.o
+		tmp/stage2c.o
 	}
 	
-	.kernel 0x400000 : AT(0x400) {
+	.kernel_start 0xFF000000 : AT(0x800) {
+		tmp/paging.o (.paging_dir)		
+	}
+	.kernel : {
 		* (*)
 	}
+	.kernel_end = .;
 }
