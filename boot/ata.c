@@ -29,22 +29,15 @@ inline void io_wait(void) {
   outb(0x80, 0);
 }
 
-#include "../kernel/terminal.h"
-#include "../kernel/util.h"
-
 extern u32 KERNEL_SRC[]; 
 extern u32 KERNEL_DST[]; 
 extern u32 KERNEL_LEN[]; 
 
-char b[30] = { 0 };
 void load_kernel(void) {
   u16 kernel_src = (u32)KERNEL_SRC;
   u16 kernel_dst = (u32)KERNEL_DST;
   u16 kernel_len = (u32)KERNEL_LEN;
   
-  format(b, 30, "%i %i %i\n", kernel_src, kernel_dst, kernel_len);
-  terminal_write(b, 30);
-
   // Set to LBA mode.always already knows that the device is in that c
   outb(0x1F6, 0x40);
 

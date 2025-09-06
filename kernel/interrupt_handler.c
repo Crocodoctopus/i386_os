@@ -17,7 +17,8 @@ void __attribute((cdecl)) interrupt_handler(struct InterruptState *state) {
   // Handle IRQ from external devices.
   if (state->interrupt >= 32) {
     //format(data, 12, "IRQ %i ", state->interrupt - 32);
-    //terminal_write(data, 12);
+    format(data, 12, "ESP %i ", state->esp);
+    terminal_write(data, 12);
 
     if (state->interrupt == 33) {
       inb(0x64);

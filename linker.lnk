@@ -3,29 +3,25 @@ OUTPUT_ARCH(i386)
 SECTIONS {
 	STAGE2_SRC = LOADADDR(.stage2)/512 + 1;
 	STAGE2_DST = ADDR(.stage2);
-	STAGE2_SIZE = (.end - .start + 511)/512;
+	STAGE2_SIZE = (SIZEOF(.stage2) + 511)/512;
 
 	KERNEL_SRC = LOADADDR(.kernel)/512;
 	KERNEL_DST = ADDR(.kernel);
 	KERNEL_LEN = (SIZEOF(.kernel) + 511)/512;
 	
-	. = 0x7C00;
-	.stage1 : AT(0x0) {
+	.stage1 0x7C00 : AT(0x0) {
 		tmp/stage1.o (.stage1)
 	}
 	.bootsig : AT(0x1FE) {
 		tmp/stage1.o (.bootsig)
 	}
 
-	. = 0x8000;
-	.start = .;
-	.stage2 : AT(0x200) {
+	.stage2 0x8000 : AT(0x200) {
 		tmp/stage2.o (.text)
 		tmp/ata.o (.text)
 	}
 	
-	.kernel : {
+	.kernel 0x400000 : AT(0x400) {
 		* (*)
 	}
-	.end = .;
 }
