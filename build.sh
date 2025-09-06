@@ -2,7 +2,7 @@
 mkdir -p bin
 mkdir -p tmp
 
-CFLAGS="-O2 -ffreestanding -nostdlib -nostartfiles -m32 -fno-pie -fno-asynchronous-unwind-tables"
+CFLAGS="-O2 -mno-sse -ffreestanding -nostdlib -nostartfiles -m32 -fno-pie -fno-asynchronous-unwind-tables"
 
 # Create various obj files.
 nasm -O2 -f elf32 boot/stage1.asm -o tmp/stage1.o

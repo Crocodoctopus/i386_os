@@ -11,15 +11,19 @@ struct __attribute__((packed)) InterruptState {
   u32 esp, ss; // these may not have been pushed
 };
 
-char data[12] = { 0 };
 void __attribute((cdecl)) interrupt_handler(struct InterruptState *state) {
+  char data[32] = { 0 };
+
+  //
+  if (state->interrupt < 32) {
+    format(data, 32, "Interrupt: %i\n", state->interrupt);
+    terminal_write(data, 32);
+  }
 
   // Handle IRQ from external devices.
   if (state->interrupt >= 32) {
-    //format(data, 12, "IRQ %i ", state->interrupt - 32);
-    format(data, 12, "ESP %i ", state->esp);
-    terminal_write(data, 12);
-
+    format(data, 32, "IRQ %i\n", state->interrupt - 32);
+    terminal_write(data, 32);
     if (state->interrupt == 33) {
       inb(0x64);
     }
