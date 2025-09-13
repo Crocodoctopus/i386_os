@@ -8,6 +8,7 @@ extern terminal_clear
 extern load_kernel
 extern init_page_directory
 extern PAGE_DIRECTORY_PHYS
+extern kernel_stack
 
 %define BIT(x) (1 << x)
 
@@ -23,12 +24,16 @@ stage2_entry:
 
 bits 32
 start32:
+    ; set data and stack segment
+    mov ax, 0x10
+    mov ds, ax
+    mov ss, ax
+    
     ; load the rest of the kernel
     call load_kernel
 
     ; start basic paging
     call init_page_directory
-    mov word [0xB8002], 0x0F00 | '*'
 
     mov eax, cr4
     or eax, BIT(4) ; page size extension
@@ -43,6 +48,9 @@ start32:
     
     ; correct the gdt
     lgdt [gdt_descriptor]
+
+    ; move stack to final position
+    add esp, kernel_stack + 0x1000
 
     ; jump to start, never return
     jmp _start

@@ -4,6 +4,7 @@ extern void _start(void);
 #include "util.h"
 #include "pic.h"
 #include "idt.h"
+#include "paging.h"
 
 static inline void hlt(void) {
   __asm__ volatile("hlt" ::: "memory");
@@ -20,22 +21,29 @@ static inline void set_idt(struct IDT32Descriptor *idtr) {
     : "memory");
 }
 
-char buf[30] = { 0 };
-__attribute__((noreturn)) void _start(void) {
-  // 
+extern u8 kernel_stack[];
+
+__attribute__((noreturn)) void _start(void) {    
+  char buf[50] = { 0 };
+
+  //
   terminal_clear();
 
-  // Initialize idt32 and
+  // Initialize idt32.
   init_idt32();
   set_idt(&idt_descriptor);
-  
+
+  // Initialize programmable interrupt chip.
   init_pic();
 
+  // Interrupts can now be properly handled.
   sti();
 
-  format(buf, 30, "&_start: %i\n", &_start); 
-  terminal_write(buf, 30);
+  // Print some debug stuff.
+  format(buf, 50, "&_start: %X\nstack: %X\n", &_start, kernel_stack); 
+  terminal_write(buf, 50);
 
+  // TODO
   while (1) {
     hlt();
   }

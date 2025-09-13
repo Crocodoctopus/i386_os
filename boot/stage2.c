@@ -8,11 +8,14 @@
 extern union PageDirectoryEntry PAGE_DIRECTORY_PHYS[1024];
 extern u32 KERNEL_SRC[]; 
 extern u32 KERNEL_DST[]; 
-extern u32 KERNEL_LEN[]; 
+extern u32 KERNEL_LEN[];
+
+extern u8 kernel_start[];
+extern u8 kernel_stack[];
 
 void init_page_directory() {
   for (usize i = 0; i < 1024; i++) {
-    PAGE_DIRECTORY_PHYS[i] = (union PageDirectoryEntry) { 0 };
+    PAGE_DIRECTORY_PHYS[i].page_size_4kb.p = 0;
   }
 
   // Unity map 0x0
@@ -32,8 +35,8 @@ void init_page_directory() {
     .address_31_22 = 0, 
   };
 
-  // Map 0xFF000000 to first 0x400000
-  PAGE_DIRECTORY_PHYS[0xFF000000 >> 22].page_size_4mb = (struct PageDirectoryEntry4mb) {
+  // Map 0xF0000000 to first 0x400000
+  PAGE_DIRECTORY_PHYS[(usize)kernel_start >> 22].page_size_4mb = (struct PageDirectoryEntry4mb) {
     .p = 1,
     .rw = 1,
     .us = 0,
@@ -48,6 +51,23 @@ void init_page_directory() {
     .zero = 0,
     .address_31_22 = 1, 
   };
+
+  // map first 4 MiB to FFFFFFFF
+  /*PAGE_DIRECTORY_PHYS[(usize)kernel_stack >> 22].page_size_4mb = (struct PageDirectoryEntry4mb) {
+    .p = 1,
+    .rw = 0,
+    .us = 0,
+    .pwt = 0,
+    .pcd = 0,
+    .a = 0,
+    .d = 0,
+    .one = 1,
+    .g = 1,
+    .pat = 0,
+    .address_39_32 = 0,
+    .zero = 0,
+    .address_31_22 = 2,
+  };*/
 }
 
 void load_kernel(void) {
@@ -55,7 +75,7 @@ void load_kernel(void) {
   void *kernel_dst = KERNEL_DST;
   u32 kernel_len = (u32)KERNEL_LEN;
   
-  // Set to LBA mode.always already knows that the device is in that c
+  // Set to LBA mode.
   outb(0x1F6, 0x40);
 
   // we want to read 0x200 to 0x400000

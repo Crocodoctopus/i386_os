@@ -39,3 +39,5 @@ union PageDirectoryEntry {
     usize : 24;
   };
 };
+
+extern union PageDirectoryEntry page_directory[1024];

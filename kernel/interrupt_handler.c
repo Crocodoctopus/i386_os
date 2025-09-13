@@ -21,8 +21,7 @@ void __attribute((cdecl)) interrupt_handler(struct InterruptState *state) {
   }
 
   if (state->interrupt == 13) {
-    __asm__ volatile("hlt");
-    
+    __asm__ volatile("hlt");    
   }
 
   // Handle IRQ from external devices.

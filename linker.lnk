@@ -10,6 +10,9 @@ SECTIONS {
 	KERNEL_LEN = (.kernel_end - ADDR(.kernel_start) + 511)/512;
 
 	PAGE_DIRECTORY_PHYS = KERNEL_DST;
+
+	kernel_start = ADDR(.kernel_start);
+	kernel_stack = ADDR(.kernel_stack);
 	
 	.stage1 0x7C00 : AT(0x0) {
 		tmp/stage1.o (.stage1)
@@ -23,11 +26,14 @@ SECTIONS {
 		tmp/stage2c.o
 	}
 	
-	.kernel_start 0xFF000000 : AT(0x800) {
+	.kernel_start 0xF0000000 : AT(0x800) {
 		tmp/paging.o (.paging_dir)		
 	}
 	.kernel : {
 		* (*)
+	}
+	.kernel_stack : ALIGN(0x4) {
+		. = . + 0x1000;
 	}
 	.kernel_end = .;
 }
